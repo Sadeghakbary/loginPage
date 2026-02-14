@@ -1,16 +1,20 @@
+type EventCallback<T = unknown> = (data: T) => void;
+
 const eventBus = {
-  on: (event: string, callback: (data: any) => void) => {
-    document.addEventListener(event, (e: any) => callback(e.detail));
+  on: <T = unknown>(event: string, callback: EventCallback<T>): EventListener => {
+    const handler: EventListener = (e: Event) => {
+      const customEvent = e as CustomEvent<T>;
+      callback(customEvent.detail);
+    };
+
+    document.addEventListener(event, handler);
+    return handler;
   },
-  dispatch: (event: string, data?: any) => {
-    document.dispatchEvent(new CustomEvent(event, { detail: data || null }));
+  dispatch: <T = unknown>(event: string, data?: T) => {
+    document.dispatchEvent(new CustomEvent<T>(event, { detail: data ?? null }));
   },
-  remove: (event: string, callback?: (data: any) => void) => {
-    if (callback) {
-      document.removeEventListener(event, callback);
-    } else {
-      document.removeEventListener(event, () => {});
-    }
+  remove: (event: string, handler: EventListener) => {
+    document.removeEventListener(event, handler);
   },
 };
 

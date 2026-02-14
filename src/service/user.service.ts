@@ -1,8 +1,3 @@
-import axios from 'axios';
-import authHeader from './auth-header';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/test/';
-
 // Mock data for development without backend
 const MOCK_DATA = {
   publicContent: "Welcome to the application! This is public content available to all users.",

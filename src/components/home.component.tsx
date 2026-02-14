@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Container, Typography, CircularProgress, Alert, Paper } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
+import { Box, Container, Typography, CircularProgress, Alert, Paper, Grid } from "@mui/material";
 import UserService from "../service/user.service";
 
 const Home: React.FC = () => {
@@ -28,7 +27,7 @@ const Home: React.FC = () => {
     <Box sx={{ py: 6 }}>
       <Container maxWidth="md">
         <Grid container justifyContent="center">
-          <Grid xs={12}>
+          <Grid size={12}>
             <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
               {isLoading ? (
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 120 }}>

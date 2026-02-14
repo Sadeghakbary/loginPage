@@ -18,6 +18,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -30,11 +31,40 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+interface StoredUser {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
 // Mock users for demo
 const MOCK_USERS: Record<string, { password: string; role: string }> = {
   "user": { password: "user123", role: "ROLE_USER" },
   "moderator": { password: "mod123", role: "ROLE_MODERATOR" },
   "admin": { password: "admin123", role: "ROLE_ADMIN" }
+};
+
+const LOCAL_USERS_KEY = 'users';
+
+const readLocalUsers = (): StoredUser[] => {
+  const raw = localStorage.getItem(LOCAL_USERS_KEY);
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed as StoredUser[];
+    }
+    return [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLocalUsers = (users: StoredUser[]) => {
+  localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -61,12 +91,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const mockUser = MOCK_USERS[username];
+      const localUsers = readLocalUsers();
+      const localUser = localUsers.find(entry => entry.username === username);
+
       if (mockUser && mockUser.password === password) {
         const userData: User = {
           id: Math.floor(Math.random() * 1000),
           username,
           email: `${username}@example.com`,
           roles: [mockUser.role],
+          accessToken: `mock-jwt-token-${Date.now()}`
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      } else if (localUser && localUser.password === password) {
+        const userData: User = {
+          id: Math.floor(Math.random() * 1000),
+          username: localUser.username,
+          email: localUser.email,
+          roles: [localUser.role],
           accessToken: `mock-jwt-token-${Date.now()}`
         };
         localStorage.setItem('user', JSON.stringify(userData));
@@ -89,7 +132,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
+      const localUsers = readLocalUsers();
+      const usernameExists = localUsers.some(entry => entry.username === username);
+      if (usernameExists) {
+        throw new Error('Username already exists');
+      }
+
+      const newStoredUser: StoredUser = {
+        username,
+        email,
+        password,
+        role: 'ROLE_USER'
+      };
+      writeLocalUsers([...localUsers, newStoredUser]);
+
       const userData: User = {
         id: Math.floor(Math.random() * 1000),
         username,

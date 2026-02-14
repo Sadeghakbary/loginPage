@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -13,22 +12,12 @@ import BoardModerator from './components/board-moderator.component';
 import BoardAdmin from './components/board-admin.component';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
-const App: React.FC = () => {
+const App = () => {
   const { user, logout, isLoading } = useAuth();
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setShowModeratorBoard(user.roles.includes('ROLE_MODERATOR'));
-      setShowAdminBoard(user.roles.includes('ROLE_ADMIN'));
-    } else {
-      setShowModeratorBoard(false);
-      setShowAdminBoard(false);
-    }
-  }, [user]);
+  const showModeratorBoard = Boolean(user?.roles.includes('ROLE_MODERATOR'));
+  const showAdminBoard = Boolean(user?.roles.includes('ROLE_ADMIN'));
 
   const handleLogOut = () => {
     logout();

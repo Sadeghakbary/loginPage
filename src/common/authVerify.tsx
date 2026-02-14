@@ -4,7 +4,7 @@ import { withRouter } from "./withRouter";
 const parseJwt = (token: string) => {
   try {
     return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -18,6 +18,7 @@ interface AuthVerifyProps {
 
 const AuthVerify = (props: AuthVerifyProps) => {
   const { location } = props.router;
+  const { logOut } = props;
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -27,12 +28,14 @@ const AuthVerify = (props: AuthVerifyProps) => {
       const decodedJwt = parseJwt(user.accessToken);
 
       if (decodedJwt && decodedJwt.exp * 1000 < Date.now()) {
-        props.logOut();
+        logOut();
       }
     }
-  }, [location]);
+  }, [location, logOut]);
 
   return <div></div>;
 };
 
-export default withRouter(AuthVerify);
+const AuthVerifyWithRouter = withRouter(AuthVerify);
+
+export default AuthVerifyWithRouter;

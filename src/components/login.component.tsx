@@ -53,7 +53,6 @@ const Login: React.FC = () => {
     try {
       await login(username, password);
       navigate("/profile");
-      window.location.reload();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       setMessage(errorMessage);

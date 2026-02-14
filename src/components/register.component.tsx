@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 
@@ -33,6 +33,7 @@ const vpassword = (value: string): string | null => {
 
 const Register: React.FC = () => {
   const { register, isLoading } = useAuth();
+  const navigate = useNavigate();
   
   const [username, setUsername] = useState("");
   const [emailState, setEmail] = useState("");
@@ -95,6 +96,7 @@ const Register: React.FC = () => {
       await register(username, emailState, password);
       setMessage("Registration successful!");
       setSuccessful(true);
+      navigate("/profile");
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
       setMessage(errorMessage);
